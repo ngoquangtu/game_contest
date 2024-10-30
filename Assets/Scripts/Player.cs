@@ -13,12 +13,13 @@ public class Player : MonoBehaviour
     public TextMeshProUGUI redBulletText;
     public TextMeshProUGUI greenBulletText;
     public TextMeshProUGUI yellowBulletText;
-
+    public AudioSource bulletAudio;
     private string currentBulletColor = "Red";
 
     public  int redBulletCount = 10;
     public  int greenBulletCount = 10;
     public int yellowBulletCount = 10;
+    public AudioClip bulletSound;
 
     void Update()
     {
@@ -61,6 +62,7 @@ public class Player : MonoBehaviour
 
     void SpawnBullet()
     {
+        bulletAudio.PlayOneShot(bulletSound);
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Bullet bulletScript = bullet.GetComponent<Bullet>();
         bulletScript.bulletColor = currentBulletColor;

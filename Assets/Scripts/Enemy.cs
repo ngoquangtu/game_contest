@@ -5,7 +5,7 @@ public class Enemy : MonoBehaviour
     public float speed = 2f;
     private Transform player;
     public string enemyColor; // Xanh, Đỏ hoặc Vàng
-
+    public int hitCount = 0;  // Số lần bị bắn trúng
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -44,9 +44,35 @@ public class Enemy : MonoBehaviour
                 break;
         }
     }
+    public void TakeHit()
+    {
+        hitCount++;
+
+        if (hitCount >= 2)
+        {
+            // Enemy bị tiêu diệt sau 2 lần trúng đạn
+            Destroy(gameObject);
+            GameManager.Instance.AddScore(2);  // Cộng điểm vào game
+        }
+        else
+        {
+            // Đổi màu ngẫu nhiên sau mỗi lần trúng đạn
+            SetColor();
+        }
+    }
 
     public void DestroyEnemy()
     {
         Destroy(gameObject);
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            Destroy(other.gameObject);
+            GameManager.Instance.EndGame();
+
+        }
+
     }
 }

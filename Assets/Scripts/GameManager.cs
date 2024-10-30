@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI levelText;
+    public TextMeshProUGUI targetScore;
 
     public GameObject winPanel;   // Panel khi thắng
     public GameObject losePanel;  // Panel khi thua
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviour
     private int level = 1;
     public int winScore = 10;
     public int nextLevel;
+    public AudioSource audioSource; 
+    public AudioClip loseSound;     
     public static GameManager Instance { get; private set; }
 
     void Start()
@@ -26,6 +29,7 @@ public class GameManager : MonoBehaviour
         UpdateScoreText();
         UpdateTimerText();
         UpdateLevelText();
+        UpdateTargetScore();
 
         winPanel.SetActive(false);
         losePanel.SetActive(false);
@@ -77,12 +81,16 @@ public class GameManager : MonoBehaviour
     }
     public void Replay()
     {
-        SceneManager.LoadScene(nextLevel - 1);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void UpdateScoreText()
     {
         scoreText.text = "Score: " + score;
+    }
+    private void UpdateTargetScore()
+    {
+        targetScore.text = "Winning Score: "+ winScore.ToString(); 
     }
 
     private void UpdateTimerText()
@@ -95,12 +103,16 @@ public class GameManager : MonoBehaviour
         levelText.text = "Level: " + level;
     }
 
-    private void EndGame()
+    public void EndGame()
     {
         ShowLosePanel();
+        if (audioSource != null && loseSound != null)
+        {
+            audioSource.PlayOneShot(loseSound);
+        }
     }
 
-    private void WinGame()
+    public void WinGame()
     {
         ShowWinPanel();
     }
@@ -109,8 +121,14 @@ public class GameManager : MonoBehaviour
     {
         winPanel.SetActive(true);
 
-        winPanel.transform.localScale = Vector3.zero;
-        winPanel.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce);
+        // Hiệu ứng Fade-In bằng DOTween
+        CanvasGroup canvasGroup = winPanel.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = winPanel.AddComponent<CanvasGroup>();
+        }
+        canvasGroup.alpha = 0;
+        canvasGroup.DOFade(1, 0.5f).SetEase(Ease.InOutQuad);
     }
 
     private void ShowLosePanel()
